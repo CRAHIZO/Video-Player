@@ -1,0 +1,36 @@
+{
+  "name": "video-player",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "com.ejemplo.miapp",
+    "productName": "Video player randomizer",
+    "files": [
+      "**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "./Icon.ico"
+    }
+  },
+  "keywords": [],
+  "author": "CRAHIZO",
+  "license": "ISC",
+  "description": "Proyecto para encontrar y reproducir varios videos [MP4] en una carpeta o reproducirlos de manera aleatoria",
+  "devDependencies": {
+    "7zip-bin": "^5.2.0",
+    "electron": "^32.0.1",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "string-similarity": "^4.0.4"
+  }
+}

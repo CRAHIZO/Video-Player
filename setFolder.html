@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurar Carpeta de Videos</title>
+</head>
+<body>
+    <h1>Configurar Carpeta de Videos</h1>
+    <input type="text" id="folderPath" placeholder="Ingrese la ruta de la carpeta" />
+    <button id="setFolder">Establecer Carpeta</button>
+    <p id="responseMessage"></p>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const folderPathInput = document.getElementById('folderPath');
+        const setFolderButton = document.getElementById('setFolder');
+        const responseMessage = document.getElementById('responseMessage');
+
+        setFolderButton.addEventListener('click', () => {
+            const folderPath = folderPathInput.value;
+            ipcRenderer.invoke('set-folder-path', folderPath).then((message) => {
+                responseMessage.textContent = message;
+                if (message === 'Carpeta establecida correctamente') {
+                    // Redirige a index.html después de establecer la carpeta
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000); // Espera 2 segundos antes de redirigir
+                }
+            }).catch((error) => {
+                responseMessage.textContent = `Error: ${error}`;
+            });
+        });
+    </script>
+</body>
+</html>

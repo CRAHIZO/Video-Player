@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: row;
+            margin: 0;
+            padding: 0;
+        }
+        #videoSection {
+            width: 60%;
+            padding: 20px;
+        }
+        #videoList {
+            width: 40%;
+            padding: 20px;
+            border-left: 2px solid #ccc;
+        }
+        #videoList ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #videoList li {
+            margin-bottom: 10px;
+        }
+        #videoList a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <div id="videoSection">
+        <h1>Video Player</h1>
+        <video id="videoPlayer" width="100%" controls></video>
+        <br /><br />
+
+        <!-- Sección para enviar datos -->
+        <h2>Buscar Video</h2>
+        <form id="dataForm">
+            <label for="inputData">Escribe el nombre del video:</label>
+            <input type="text" id="inputData" />
+            <button type="submit">Buscar</button>
+        </form>
+        <p id="responseMessage"></p>
+    </div>
+    <div id="videoList">
+        <h2>Lista de Videos</h2>
+        <ul id="videoItems"></ul>
+    </div>
+
+    <script>
+        const videoPlayer = document.getElementById('videoPlayer');
+        const dataForm = document.getElementById('dataForm');
+        const inputData = document.getElementById('inputData');
+        const responseMessage = document.getElementById('responseMessage');
+        const videoItems = document.getElementById('videoItems');
+
+        const { ipcRenderer } = require('electron');
+
+        function updateVideoList(videos) {
+            videoItems.innerHTML = ''; // Limpia la lista actual
+            videos.forEach((video, index) => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#';
+                a.textContent = `${index + 1}. ${video.name}`;
+                a.addEventListener('click', () => {
+                    videoPlayer.src = video.path;
+                    videoPlayer.play();
+                });
+                li.appendChild(a);
+                videoItems.appendChild(li);
+            });
+        }
+
+        dataForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Evita el envío tradicional del formulario
+            const data = inputData.value;
+            ipcRenderer.invoke('process-data', data).then((response) => {
+                if (Array.isArray(response)) {
+                    updateVideoList(response);
+                } else if (response.videoPath) {
+                    videoPlayer.src = response.videoPath;
+                    videoPlayer.play();
+                    responseMessage.textContent = '';
+                } else {
+                    responseMessage.textContent = 'No se encontró ningún video.';
+                }
+            }).catch((error) => {
+                responseMessage.textContent = `Error: ${error}`;
+            });
+        });
+
+        // Inicialmente muestra 10 videos aleatorios
+        ipcRenderer.invoke('process-data', '').then((response) => {
+            if (Array.isArray(response)) {
+                updateVideoList(response);
+            }
+        }).catch((error) => {
+            responseMessage.textContent = `Error: ${error}`;
+        });
+    </script>
+</body>
+</html>
